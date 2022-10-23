@@ -6,7 +6,6 @@ from datetime import datetime
 from script_pandas import process_csv
 
 # import logging
-
 # logging.basicConfig(filename='record.log', level=logging.DEBUG)
 
 
@@ -29,7 +28,7 @@ def create_app():
     app = Flask(__name__)
     if __name__ == "__main__":
         app.run(debug=True, threaded=True)
-    #app.run(debug=True)
+
 
     @app.route('/upload', methods=['GET', 'POST'])
     def upload():
@@ -39,23 +38,21 @@ def create_app():
                 
                 fn = secure_filename(file.filename)
 
-                #fn = f'{fn.split(".")[0]}_{str(datetime.now())}.csv'
+
                 dt = str(datetime.now()).replace(" ", "_")
                 dt = str(datetime.now()).replace(":", "-") 
                 fn = fn.split(".")[0]
                 fn = f"{fn}_{dt}.csv"
-                
-                
-                #save_location = f"{my_absolute_dirpath}/input/data_{dt}.csv"
+
                 
                 file.save(input_target+fn)
                 output_file, elapsed_time = process_csv(fn)
                 
                 pTimes.append(elapsed_time)
                 
-                #return send_from_directory('output', output_file)
+
             return redirect(url_for('download'))
-            #return 'uploaded'
+
 
         return render_template('upload.html')
 
