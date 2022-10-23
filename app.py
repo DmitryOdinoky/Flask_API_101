@@ -3,16 +3,23 @@ import os
 from flask import Flask, request, render_template, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 from datetime import datetime
-from script import process_csv
+from script_pandas import process_csv
+
+# import logging
+
+# logging.basicConfig(filename='record.log', level=logging.DEBUG)
 
 
 my_absolute_dirpath = os.getcwd()
 my_absolute_dirpath.replace('\\' ,'/')
 my_absolute_dirpath = my_absolute_dirpath.replace('\\' ,'/')
-input_target = f"{my_absolute_dirpath}/input/data_temp_in.csv"
-output_target = f"{my_absolute_dirpath}/output/data_temp_out.csv"
+input_target = f"{my_absolute_dirpath}/input/"
+output_target = f"{my_absolute_dirpath}/output/"
 
 ALLOWED_EXTENSIONS = set(['csv'])
+
+
+pTimes = []
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -21,7 +28,7 @@ def allowed_file(filename):
 def create_app():
     app = Flask(__name__)
     if __name__ == "__main__":
-        app.run(debug=True)
+        app.run(debug=True, threaded=True)
     #app.run(debug=True)
 
     @app.route('/upload', methods=['GET', 'POST'])
@@ -29,13 +36,22 @@ def create_app():
         if request.method == 'POST':
             file = request.files['file']
             if file and allowed_file(file.filename):
-                #filename = secure_filename(file.filename)
-                #new_filename = f'{filename.split(".")[0]}_{str(datetime.now())}.csv'
-                #dt = str(datetime.now()).replace(" ", "_")
+                
+                fn = secure_filename(file.filename)
+
+                #fn = f'{fn.split(".")[0]}_{str(datetime.now())}.csv'
+                dt = str(datetime.now()).replace(" ", "_")
+                dt = str(datetime.now()).replace(":", "-") 
+                fn = fn.split(".")[0]
+                fn = f"{fn}_{dt}.csv"
+                
+                
                 #save_location = f"{my_absolute_dirpath}/input/data_{dt}.csv"
                 
-                file.save(input_target)
-                output_file = process_csv(input_target)
+                file.save(input_target+fn)
+                output_file, elapsed_time = process_csv(fn)
+                
+                pTimes.append(elapsed_time)
                 
                 #return send_from_directory('output', output_file)
             return redirect(url_for('download'))
@@ -45,7 +61,7 @@ def create_app():
 
     @app.route('/download')
     def download():
-        return render_template('download.html', files=os.listdir('output'))
+        return render_template('download.html', files=zip(os.listdir('output'), pTimes))
 
     @app.route('/download/<filename>')
     def download_file(filename):

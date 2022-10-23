@@ -1,6 +1,7 @@
 import csv
 import os
 
+
 from collections import defaultdict
 from datetime import datetime
 from decimal import Decimal
@@ -11,6 +12,7 @@ my_absolute_dirpath = my_absolute_dirpath.replace('\\' ,'/')
 
 #%%
 def process_csv(filename):
+    
     product_types = defaultdict(Decimal)
 
     with open(filename, 'r') as f:
@@ -34,3 +36,5 @@ def process_csv(filename):
             writer.writerow([product_type, price])
 
     return output_file
+
+
