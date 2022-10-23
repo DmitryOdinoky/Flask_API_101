@@ -1,12 +1,16 @@
 import os
 
+
 from flask import Flask, request, render_template, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 from datetime import datetime
-from script_pandas import process_csv
+import time
+from script_pandas_ch_thr import process_csv
+
 
 # import logging
 # logging.basicConfig(filename='record.log', level=logging.DEBUG)
+
 
 
 my_absolute_dirpath = os.getcwd()
@@ -16,6 +20,12 @@ input_target = f"{my_absolute_dirpath}/input/"
 output_target = f"{my_absolute_dirpath}/output/"
 
 ALLOWED_EXTENSIONS = set(['csv'])
+
+for f in os.listdir(input_target):
+    os.remove(os.path.join(input_target, f))
+    
+for f in os.listdir(output_target):
+    os.remove(os.path.join(output_target, f))
 
 
 pTimes = []
@@ -32,10 +42,14 @@ def create_app():
 
     @app.route('/upload', methods=['GET', 'POST'])
     def upload():
+
+        
+        
         if request.method == 'POST':
             file = request.files['file']
             if file and allowed_file(file.filename):
                 
+               
                 fn = secure_filename(file.filename)
 
 
@@ -46,7 +60,10 @@ def create_app():
 
                 
                 file.save(input_target+fn)
-                output_file, elapsed_time = process_csv(fn)
+                st = time.time()
+                output_file = process_csv(fn)
+                et = time.time()
+                elapsed_time = round(et - st, 6)
                 
                 pTimes.append(elapsed_time)
                 
