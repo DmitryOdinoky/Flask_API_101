@@ -25,7 +25,7 @@ def process_csv(filename):
     et = time.time()
     elapsed_time = round(et - st, 6)
 
-    return filename, elapsed_time
+
 
 
 
