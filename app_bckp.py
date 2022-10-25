@@ -1,5 +1,5 @@
 import os
-from multiprocessing import Process
+
 
 from flask import Flask, request, render_template, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
@@ -47,10 +47,7 @@ def create_app():
         
         if request.method == 'POST':
             file = request.files['file']
-            
             if file and allowed_file(file.filename):
-                
-
                 
                
                 fn = secure_filename(file.filename)
@@ -64,12 +61,7 @@ def create_app():
                 
                 file.save(input_target+fn)
                 st = time.time()
-                
-
-                p = Process(target=process_csv, args=[fn])
-                p.start()
-                
-                
+                output_filename = process_csv(fn)
                 et = time.time()
                 elapsed_time = round(et - st, 6)
                 

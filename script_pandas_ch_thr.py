@@ -19,13 +19,16 @@ def process_csv(filename):
 
     
 
+    df_iter = pd.read_csv(my_absolute_dirpath + "/input/" + filename, index_col=False, chunksize=500)
     
-    with concurrent.futures.ProcessPoolExecutor(num_processes) as pool:
-
-        df = pd.read_csv(my_absolute_dirpath + "/input/" + filename, index_col=False)
-        df_out = df.groupby(["Song", "Date"])["Number of Plays"].sum().reset_index().sort_values(by=['Song'], ascending=False) 
-
-        pool.submit(df_out.to_csv, my_absolute_dirpath + "/output/" + filename)
+    for i, df_out in enumerate(df_iter):
+        
+        with concurrent.futures.ProcessPoolExecutor(num_processes) as pool:
+    
+    
+            df_out = df_out.groupby(["Song", "Date"])["Number of Plays"].sum().reset_index().sort_values(by=['Song'], ascending=False) 
+    
+            pool.submit(df_out.to_csv, my_absolute_dirpath + "/output/" + filename)
 
     
 
