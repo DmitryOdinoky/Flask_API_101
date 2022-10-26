@@ -5,7 +5,7 @@ from flask import Flask, request, render_template, redirect, url_for, send_from_
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import time
-from script_pandas_ch_thr import process_csv
+from script_pandas_chunks import process_csv
 
 
 # import logging
